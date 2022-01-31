@@ -1,0 +1,92 @@
+{% extends 'partials/_base.html' %}
+{% load videolist %}
+{% load static %}
+
+
+{% block content %}
+
+    <section class="fpage d-flex justify-content-center justify-content-lg-end">
+        <div class="content-frame">
+            <div class="container-fluid bgc-4 clr-2 h-100 overflow-auto">
+                <div class="row">
+                    <div class="col-12 col-lg-8 d-flex flex-column p-3">
+                        <video class="plyr__video-embed" style="width: 100% !important;" id="player">
+                            <source
+                                src="https://drive.google.com/uc?export=download&id={{ video.driveid }}"
+                                style="width: 100% !important;" ; allowtransparency allow="autoplay">
+                            </source>
+                        </video>
+                        <div class="pt-2"><span class="badge bg-primary">{{ playlist.title }}</span></div>
+                        <div class="font-open fw-bolder fs-5 py-2">{{ video.name }}</div>
+                        <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+                            <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off">
+                            <label class="btn btn-outline-primary font-open fw-bolder" for="btncheck1">
+                                <i class="bi bi-paperclip mx-1 text-light"></i>
+                                <a href="{{ video.attach }}" target="_blank" class="text-decoration-none text-light"> DOSYA EKİ </a>
+                            </label>
+                            <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off">
+                            <label class="btn btn-outline-primary font-open fw-bolder" for="btncheck2">
+                                <i class="bi bi-code-square mx-2 text-light"></i>
+                                <a href="#" class="text-decoration-none text-light"> ANTRENMAN YAP </a>
+                            </label>
+
+                            <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off">
+                            <label class="btn btn-outline-primary font-open fw-bolder" for="btncheck3">
+                                <i class="bi bi-check-all mx-2 text-light"></i>
+                                <a href="{% url 'videobitir' video.slug %}" class="text-decoration-none text-light"> İZLEDİM İŞARETLE </a>
+                            </label>
+                        </div>
+                        <div class="font-open my-3">
+                            {{ video.desc }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4 p-3">
+
+
+
+                        <div class="accordion rounded rounded-3 bg-light text-dark" style="max-height: 800px !important; overflow: auto;" id="accordionPanelsStayOpenExample">
+                            {% for i in playlist.plist_units.all %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="panelsStayOpen-heading-{{ forloop.counter }}">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#panelsStayOpen-collapse-{{ forloop.counter }}" aria-expanded="true"
+                                        aria-controls="panelsStayOpen-collapse-{{ forloop.counter }}">
+                                        
+                                        <b>{{ i.nameUnit }}</b>
+                                        
+                                    </button>
+                                </h2>
+                                <div id="panelsStayOpen-collapse-{{ forloop.counter }}" class="accordion-collapse collapse show"
+                                    aria-labelledby="panelsStayOpen-heading-{{ forloop.counter }}">
+                                    <div class="accordion-body">
+                                        <div class="list-group list-group-flush">
+                                            {% for x in i.videoindex_start|times:i.videoindex_end %}
+                                            <a href="{% url 'egitimvideo' playlist.slug x %}" class="list-group-item list-group-item-action">
+                                                {% if x|videoslug:playlist.title in user.accprofile.complatedvideo.all|turnlist %}
+                                                    <i class="bi bi-bookmark-star-fill mx-2"></i> 
+                                                    {% else %}
+                                                    <i class="bi bi-play-circle-fill mx-2"></i>
+                                                {% endif %}
+                                                {{ x|videounit:playlist.title }} 
+                                            </a>
+                                            {% endfor %}
+                                        </div>  
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="https://cdn.plyr.io/3.6.12/plyr.js"></script>
+    <script>
+        const player = new Plyr('#player', {
+
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'partials/_base.html' %}
+{% load static %}
+
+{% block content %}
+    <section class="fpage d-flex justify-content-center justify-content-lg-end">
+        <div class="content-frame">
+            <div class="container-fluid p-0 bgc-4 clr-2 h-100 overflow-auto">
+                <div class="d-flex flex-column overflow-hidden">
+                    <span class="font-ubuntu fs-4 fw-bolder bgc-3 mt-3 px-5 py-2">KULLANICILAR</span>
+                    <div class="row mt-4" id="profile-showcase">
+
+
+                        {% for singleprofile in allprofiles %}
+                        <div class="col-12 col-lg-3 p-4 d-flex flex-column"> 
+                            <a href="" class="text-decoration-none">
+                                <div class="pfp-circle" style="background: url({{singleprofile.pfp.url}});"></div>
+                                <div class="text-center bgc-3 clr-1 my-4 p-2 rounded font-mont fw-bolder single-line" style="height: 2.2em;">
+                                    {{singleprofile.name_surname}}
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

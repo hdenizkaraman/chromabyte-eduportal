@@ -1,0 +1,199 @@
+{% extends 'partials/_base.html' %}
+{% load static %}
+{% load videolist %}
+{% block content %}
+
+<section class="fpage d-flex justify-content-center justify-content-lg-end">
+    <div class="content-frame">
+        <div class="container-fluid bgc-4 clr-2 h-100 overflow-auto">
+            <div class="d-flex flex-column">
+                <span class="font-ubuntu fs-4 fw-bolder bgc-3 mt-3 px-5 py-2">DERSLER</span>
+                <div class="row mt-4">
+
+                    {% for list in playlist %}
+                    <div class="col-12 col-lg-4 p-3">
+                        <div class="course-item">
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                                {% if list.slug in user.accprofile.lecturelist.all|turnlist %}
+                                        <i class="bi bi-pin-angle-fill fs-6"></i>
+                                        {% else %}
+                                        <i class="bi bi-lock-fill fs-6"></i>
+                                {% endif %}                                
+                            </span>
+
+                            <span class="font-noto fs-5 text-center p-2">{{list.title}}</span>
+                            <div class="bannerbg" style="background: url({{list.banner.url}}); height: 230px;"></div>
+                            <div class="course-link">
+                                <a href="" class="" data-bs-toggle="modal"
+                                    data-bs-target="#watchedVideos-{{ forloop.counter }}"> <i class="bi bi-bookmarks-fill"></i> </a>
+                                <!-- BİTİRİLEN VİDEOLAR -->
+                                <a href="" class="" data-bs-toggle="modal"
+                                    data-bs-target="#homeworks-{{ forloop.counter }}"> <i class="bi bi-calendar2-minus-fill"></i> </a>
+                                <!-- TAKVİM BAKIMINDAN EĞİTİM SETİ PERİYODU (ADMIN PANELİNDEN KISACA EKLENİR, POP-UP PENCEREDEN GÖRÜNTÜLENİR) -->
+                                <a href="" class="" data-bs-toggle="modal"
+                                    data-bs-target="#lectureInfo-{{ forloop.counter }}"> <i
+                                        class="bi bi-info-circle-fill"></i> </a>
+                                <!-- DİREKT EĞİTİM SERİSİNİN İNCELEME SAYFASINA GÖNDERİLİR -->                            
+                                {% if list.slug in user.accprofile.lecturelist.all|turnlist %}
+                                        <a href="{% url 'egitimvideo' list.slug list.slug|nextvideo:user.accprofile %}" class=""> <i class="bi bi-play-circle-fill"></i> </a>
+                                        {% else %}
+                                        <a href="{% url 'dersal' list.slug %}" class=""> <i class="bi bi-plus-circle-fill"></i> </a>
+                                {% endif %}                     
+                                <!-- KALINAN VİDEODAN DEVAM EDİLİR -->
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+
+                    <!-- Modal -->
+                    {% for listdetail in playlist %}
+                    <div class="modal fade" id="lectureInfo-{{ forloop.counter }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-dark" id="exampleModalLabel"> {{ listdetail.title }} </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container-fluid">
+                                        
+                                        <div class="row">
+                                            <div class="col-12 col-lg-8 d-flex flex-column p-3">
+                                                <div style="height: 400px; width: 100%; background-color: var(--c1); border-radius: 5px;" class="p-3"> <div class="bannerbg w-100 h-100" style="background: url({{ listdetail.banner.url }});"></div> </div>
+                                                <div class="font-ubuntu fw-bold fs-6 text-dark my-2 p-3" style="border-left: solid 2px var(--c1)">
+                                                    {{ listdetail.desc }}
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-lg-4 p-3">
+                                                <div class="accordion rounded rounded-3" style="max-height: 800px !important; overflow: auto;" id="accordionPanelsStayOpenExample">
+                                                    {% for listunit in listdetail.plist_units.all %}
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header"
+                                                            id="panelsStayOpen-heading-{{ forloop.counter }}">
+                                                            <button class="accordion-button" type="button"
+                                                                data-bs-toggle="collapse"
+                                                                data-bs-target="#panelsStayOpen-collapse-{{ forloop.counter }}"
+                                                                aria-expanded="true"
+                                                                aria-controls="panelsStayOpen-collapse-{{ forloop.counter }}">
+                                                                <b>{{ listunit.nameUnit }}</b>
+                                                            </button>
+                                                        </h2>
+                                                        <div id="panelsStayOpen-collapse-{{ forloop.counter }}"
+                                                            class="accordion-collapse collapse show"
+                                                            aria-labelledby="panelsStayOpen-heading-{{ forloop.counter }}">
+                                                            <div class="accordion-body">
+                                                                <div class="list-group list-group-flush text-dark">
+                                                                    {% for x in listunit.videoindex_start|times:listunit.videoindex_end %}                                                            
+                                                                    <a href="#" 
+                                                                        class="list-group-item list-group-item-action">
+                                                                        <i class="bi bi-bookmark-star-fill mx-2"></i>
+                                                                        {{ x|videounit:listdetail.title }}  
+                                                                    </a>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Kapat</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Modal -->
+                    {% for listdetail in playlist %}
+                    <div class="modal fade" id="watchedVideos-{{ forloop.counter }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-dark" id="exampleModalLabel"> 
+                                        <b>İZLENEN VİDEOLAR</b> <br> {{ listdetail.title }} 
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container-fluid">
+                                        <ul class="list-group w-100 text-dark">                                            
+                                            {% for watched in listdetail.slug|watchedvideo:user.accprofile %}                                               
+                                            <li class="list-group-item"> <i class="bi bi-bookmark-star-fill mx-2"></i>  {{watched.name}}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Kapat</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Modal -->
+                    {% for listdetail in playlist %}
+                    <div class="modal fade" id="homeworks-{{ forloop.counter }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-dark" id="exampleModalLabel"> 
+                                    <b>ETKİNLİK VE ÖDEVLER</b> <br>
+                                    {{ listdetail.title }}
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container-fluid">
+                                        <ol class="list-group list-group-numbered w-100 text-dark">
+
+                                            {% for hw in homework %}
+                                                    {% if hw.homeworklist.slug == listdetail.slug %}
+                                                    <li style="word-break: break-word;" class="list-group-item d-flex flex-column">
+                                                        <div class="ms-2 mb-2 font-open me-auto">
+                                                        <div class="fw-bold"> {{hw.title}} </div>
+                                                        {{hw.desc}}
+                                                        </div>
+                                                        <div class="d-flex flex-row">
+                                                            <span class="badge bg-success rounded-pill mx-1">{{hw.startdate|date:"d/m/Y G:i"}}</span>
+                                                            <span class="badge bg-danger rounded-pill mx-1">{{hw.enddate|date:"d/m/Y G:i"}}</span>
+                                                        </div>
+                                                    </li>
+                                                    {% endif %}
+                                            {% endfor %}
+
+                                        </ol>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Kapat</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
